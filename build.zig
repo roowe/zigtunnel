@@ -15,7 +15,10 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
-    if (b.args) |args| run_cmd.addArgs(args);
+    // Zig 0.17 移除了 `Build.args`；运行参数改由 `-Dargs=<a,b,c>` 传入。
+    if (b.option([]const []const u8, "args", "Arguments forwarded to the run step")) |args| {
+        run_cmd.addArgs(args);
+    }
     const run_step = b.step("run", "Run gotunnel");
     run_step.dependOn(&run_cmd.step);
 
